@@ -1,0 +1,12 @@
+/* some colors you may find useful:
+  #115ff4
+  #060ce9
+  #28a200
+  #8d2ab5
+  #74119c
+*/
+
+table, th, td {
+  border: 1px solid black;
+  padding: 15px 70px
+}
