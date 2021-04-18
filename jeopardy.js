@@ -5,6 +5,7 @@ const NUM_CLUES_PER_CAT = 5;
 // JQuery element assignment
 $gameBoard = $("#game-board");
 $startBtn = $("#start-btn");
+$cluesTable = $("#clues")
 
 
 
@@ -27,7 +28,7 @@ $startBtn = $("#start-btn");
 
 let categories = [];
 
-    
+
 /** Get NUM_CATEGORIES random categories from API.
  *
  * Returns array of category ids, e.g. [4, 12, 5, 9, 20, 1]
@@ -49,7 +50,7 @@ async function getCategoryIds() {
     // down to only category ID. 
     let categoryIdList = response.data.map((category) => category.id);
     // lodash returns 6 random IDs out of 100 IDs 
-    return _.sampleSize(categoryIdList, [n=6]);
+    return _.sampleSize(categoryIdList, [n = 6]);
 };
 
 
@@ -74,15 +75,15 @@ async function getCategory(catId) {
         url: `${BASE_API_URL}category?id=${catId}`,
         method: "GET",
     });
-    
+
     // each clue object in 'catId's category is saved to an array
     let clueArray = response.data.clues
-    
+
     // returns object containing ID's title and all related clues 
-    return  {
-        title: response.data.title, 
+    return {
+        title: response.data.title,
         clues: clueArray
-        }
+    }
 }
 
 
@@ -98,6 +99,7 @@ async function getCategory(catId) {
    with a head row for categories and a body section for each categories 
    5 clues */
 function fillTable() {
+    console.log("fill table ran")
     $gameBoard.append(
         `<table class="table">
             <thead>
@@ -107,20 +109,38 @@ function fillTable() {
         </table>`);
 
     // in the top row of the jeopardy board (<thead>) add 1 cell for each catigory
-    for(let i = 0; i<NUM_CATEGORIES;i++){
-        $("#catagories").append(`<td id=${i}>${i+1}</td>`);
+    for (let i = 0; i < NUM_CATEGORIES; i++) {
+        $("#catagories").append(`<td id=category>${categories[i].title}</td>`);
     }
-    
+
     // add 5 queston for each category
-    for(let i = 0; i<NUM_CLUES_PER_CAT;i++){
+    for (let i = 0; i < NUM_CLUES_PER_CAT; i++) {
         $("#clues").append(`
         <tr>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
+            <td class="clue" id="clue" 
+             data-question="${categories[0].clues[i].question}"
+             data-answer="${categories[0].clues[i].answer}">?
+            </td>
+            <td class="clue" id="clue" 
+             data-question="${categories[1].clues[i].question}"
+             data-answer="${categories[1].clues[i].answer}">?
+            </td>
+            <td class="clue" id="clue" 
+             data-question="${categories[2].clues[i].question}"
+             data-answer="${categories[2].clues[i].answer}">?
+            </td>
+            <td class="clue" id="clue" 
+             data-question="${categories[3].clues[i].question}"
+             data-answer="${categories[3].clues[i].answer}">?
+            </td>
+            <td class="clue" id="clue" 
+             data-question="${categories[4].clues[i].question}"
+             data-answer="${categories[4].clues[i].answer}">?
+            </td>
+            <td class="clue" id="clue" 
+             data-question="${categories[5].clues[i].question}"
+             data-answer="${categories[5].clues[i].answer}">?
+            </td>
         </tr>
         `);
     }
@@ -135,18 +155,28 @@ function fillTable() {
  * */
 
 function handleClick(evt) {
+
     let $clickTarget = $(evt.target);
-    if($clickTarget.attr("id")==="clue"){
+    let $question = $clickTarget.data("question")
+    let $answer = $clickTarget.data("answer")
+    
+    if ($clickTarget.attr("id") === "clue") {
+        $clickTarget.html($question)
         $clickTarget.closest("td").attr("id", "question");
-        console.log("changed from ? to q");    
-    } else if ($clickTarget.attr("id")==="question"){
+        
+
+
+    } else if ($clickTarget.attr("id") === "question") {
+        $clickTarget.html($answer)
         $clickTarget.closest("td").attr("id", "answer");
-        console.log("changed from q to a");
+
+
+        console.log("final click")
     } else {
         return;
     }
 }
-$gameBoard.on("click", ".clue", handleClick)
+
 
 
 /** Wipe the current Jeopardy board, show the loading spinner,
@@ -161,6 +191,8 @@ function showLoadingView() {
 /** Remove the loading spinner and update the button used to fetch data. */
 
 function hideLoadingView() {
+    $("i").remove();
+    $startBtn.remove();
 }
 
 /** Setup game data and board:
@@ -169,12 +201,22 @@ function hideLoadingView() {
  * - call fillTable to create HTML table
  */
 
+/* when called, gets a new list of random category Ids and appends 
+   category data structures to category array */
 async function setupGameBoard() {
+    let categoryIds = await getCategoryIds();
+    // for each id in categoryIds, pass in into getCategory() and append result to category 
+    categories = await Promise.all(categoryIds.map((id) =>  getCategory(id)));
+    // fill gameBoard with categories from categories data structure
+    fillTable();
 }
 
 /** Start game: show loading state, setup game board, stop loading state */
 
 async function setupAndStart() {
+    showLoadingView();
+    await setupGameBoard();
+    hideLoadingView();
 }
 
 /** At start:
@@ -185,3 +227,6 @@ async function setupAndStart() {
  */
 
 // ADD THOSE THINGS HERE
+$startBtn.on("click", setupAndStart)
+$gameBoard.on("click", "td", handleClick);
+
