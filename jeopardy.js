@@ -60,12 +60,14 @@ async function getCategory(catId) {
     });
 
     // select 5 random clues from 'catId's category and save them to an array
+    // must replace dbl quote(") with single quote (') to avoid HTML cutting
+    // off string prematurely
     let randomClues = _.sampleSize(response.data.clues, [n = 5]);
     let clueArray = []
     for(let clue of randomClues){
         clueArray.push({
-            question:clue.question,
-            answer:clue.answer,
+            question: clue.question.replace(/"/g, "'"),
+            answer: clue.answer.replace(/"/g, "'"),
             showing:null
         })
     }
@@ -89,7 +91,9 @@ async function getCategory(catId) {
 
 /* when fillTable is called a table element is appended to the gameBoard 
    with a head row for categories and a body section for each categories 
-   5 clues */
+   5 clues, the clue elements will contain its showing status as ID,
+   and two data attributes, one for the question and one for the string  */
+
 function fillTable() {
     console.log("fill table ran")
     $gameBoard.append(
@@ -106,17 +110,35 @@ function fillTable() {
     }
 
     // add 5 queston for each category, each question will have two data attributes,
-    // data-question will contain the question and dat-answer will contain the answer
-    for (let i = 0; i < NUM_CLUES_PER_CAT; i++) {
+    // data-question will contain the question and data-answer will contain the answer
+    for (let i = 0; i < NUM_CLUES_PER_CAT; i++) { 
         $("#clues").append(`
         <tr>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-            <td class="clue" id="clue">?</td>
-        </tr>
+            <td class="clue" id="${categories[0].clues[i].showing}" 
+                data-question="${categories[0].clues[i].question}"
+                data-answer="${categories[0].clues[i].answer}">?
+            </td>
+            <td class="clue" id="${categories[1].clues[i].showing}" 
+                data-question="${categories[1].clues[i].question}"
+                data-answer="${categories[1].clues[i].answer}">?
+            </td>
+            <td class="clue" id="${categories[2].clues[i].showing}" 
+                data-question="${categories[2].clues[i].question}"
+                data-answer="${categories[2].clues[i].answer}">?
+            </td>
+            <td class="clue" id="${categories[3].clues[i].showing}" 
+                data-question="${categories[3].clues[i].question}"
+                data-answer="${categories[3].clues[i].answer}">?
+            </td>
+            <td class="clue" id="${categories[4].clues[i].showing}" 
+                data-question="${categories[4].clues[i].question}"
+                data-answer="${categories[4].clues[i].answer}">?
+            </td>
+            <td class="clue" id="${categories[5].clues[i].showing}" 
+                data-question="${categories[5].clues[i].question}"
+                data-answer="${categories[5].clues[i].answer}">?
+            </td>
+        </tr>   
         `);
     }
 }
@@ -130,12 +152,19 @@ function fillTable() {
  * */
 function handleClick(evt) {
     let $clickTarget = $(evt.target);
-    if ($clickTarget.attr("id") === "clue") {
+    let $question = $clickTarget.data("question")
+    let $answer = $clickTarget.data("answer")
+
+    if ($clickTarget.attr("id") === "null") {
+        $clickTarget.closest("td").attr("id", "question")
+        $clickTarget.html($question);        
     } else if ($clickTarget.attr("id") === "question") {
+        $clickTarget.closest("td").attr("id", "answer")
+        $clickTarget.html($answer); 
     } else {
+        return;
     }
 }
-
 
 
 /** Wipe the current Jeopardy board, show the loading spinner,
@@ -188,3 +217,26 @@ async function setupAndStart() {
 // ADD THOSE THINGS HERE
 $startBtn.on("click", setupAndStart)
 $gameBoard.on("click", ".clue", handleClick);
+
+
+
+        //     <td class="clue" id="clue" 
+        //         data-question="${categories[1].clues[i].question}"
+        //         data-answer="${categories[1].clues[i].answer}">?
+        //     </td>
+        //     <td class="clue" id="clue" 
+        //         data-question="${categories[0].clues[i].question}"
+        //         data-answer="${categories[0].clues[i].answer}">?
+        //     </td>
+        //     <td class="clue" id="clue" 
+        //         data-question="${categories[3].clues[i].question}"
+        //         data-answer="${categories[3].clues[i].answer}">?
+        //     </td>
+        //     <td class="clue" id="clue" 
+        //         data-question="${categories[4].clues[i].question}"
+        //         data-answer="${categories[4].clues[i].answer}">?
+        //     </td>
+        //     <td class="clue" id="clue" 
+        //         data-question="${categories[5].clues[i].question}"
+        //         data-answer="${categories[5].clues[i].answer}">?
+        //     </td>
