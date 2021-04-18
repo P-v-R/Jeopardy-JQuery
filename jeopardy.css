@@ -5,8 +5,65 @@
   #8d2ab5
   #74119c
 */
+body{
+  background-color: #115ff4;
+  font-family: Georgia, serif;
+}
 
-/* table, th, td {
-  border: 1px solid black;
-  padding: 10px 70px
-} */
+#title{
+  text-align: center;
+  color: aliceblue;
+}
+
+.container-fluid{
+  max-width: 50%;
+}
+#start-btn{
+  color:white;
+  background-color:#8d2ab5;
+  margin-bottom: 10px;
+  border: none;
+}
+table{
+  background-color: #060ce9 ;
+  border: solid 20px white;
+}
+
+.table td {
+  text-align: center; 
+  vertical-align: middle;
+  display: table-cell;
+  height:150px;
+  width: 300px;
+  max-width: 1px;
+  font-size: .5vw;
+  font-weight: bolder;
+  color:white;
+}
+
+#question{
+  background-color: #28a200;
+}
+#answer{
+  background-color: #28a200;
+}
+
+
+thead{
+  height: 80px;
+}
+#category{
+  font-size: .8vw;
+  font-weight: bolder;
+  color: white;
+  height: 60%;
+  
+}
+#question-mark{
+  color: white;
+  
+}
+#spinner{
+  color:white;
+  margin-top: 15px;
+}
