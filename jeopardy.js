@@ -5,10 +5,7 @@ const NUM_CLUES_PER_CAT = 5;
 // JQuery element assignment
 $gameBoard = $("#game-board");
 $startBtn = $("#start-btn");
-$cluesTable = $("#clues")
-
-
-
+$cluesTable = $("#clues");
 
 // categories is the main data structure for the app; it should eventually look like this:
 //  [
@@ -67,8 +64,9 @@ async function getCategoryIds() {
  */
 
 /* returns an object containing the argument IDs (catId) category title and an 
-   array of all clues belonging to that category  */
+   array of 5 random clues(question / answers) belonging to that category  */
 async function getCategory(catId) {
+
     // API responds with object containing all the relevant information 
     // for category with ID of 'catID' argument
     const response = await axios({
@@ -76,13 +74,14 @@ async function getCategory(catId) {
         method: "GET",
     });
 
-    // each clue object in 'catId's category is saved to an array
-    let clueArray = response.data.clues
+    // select 5 random clues from 'catId's category and save them to an array
+    let randomClues = _.sampleSize(response.data.clues, [n = 5]);
+    console.log(randomClues)
 
     // returns object containing ID's title and all related clues 
     return {
         title: response.data.title,
-        clues: clueArray
+        clues: randomClues
     }
 }
 
@@ -159,20 +158,16 @@ function handleClick(evt) {
     let $clickTarget = $(evt.target);
     let $question = $clickTarget.data("question")
     let $answer = $clickTarget.data("answer")
-    
+
     if ($clickTarget.attr("id") === "clue") {
         $clickTarget.html($question)
         $clickTarget.closest("td").attr("id", "question");
-        
-
 
     } else if ($clickTarget.attr("id") === "question") {
         $clickTarget.html($answer)
         $clickTarget.closest("td").attr("id", "answer");
-
-
-        console.log("final click")
     } else {
+        console.log($clickTarget)
         return;
     }
 }
@@ -188,8 +183,8 @@ function showLoadingView() {
     $gameBoard.append('<i class="fas fa-spinner"></i>');
 }
 
-/** Remove the loading spinner and update the button used to fetch data. */
 
+/** Remove the loading spinner and update the button used to fetch data. */
 function hideLoadingView() {
     $("i").remove();
     $startBtn.remove();
@@ -201,18 +196,19 @@ function hideLoadingView() {
  * - call fillTable to create HTML table
  */
 
+
 /* when called, gets a new list of random category Ids and appends 
    category data structures to category array */
 async function setupGameBoard() {
     let categoryIds = await getCategoryIds();
     // for each id in categoryIds, pass in into getCategory() and append result to category 
-    categories = await Promise.all(categoryIds.map((id) =>  getCategory(id)));
+    categories = await Promise.all(categoryIds.map((id) => getCategory(id)));
     // fill gameBoard with categories from categories data structure
     fillTable();
 }
 
-/** Start game: show loading state, setup game board, stop loading state */
 
+/** Start game: show loading state, setup game board, stop loading state */
 async function setupAndStart() {
     showLoadingView();
     await setupGameBoard();
@@ -228,5 +224,5 @@ async function setupAndStart() {
 
 // ADD THOSE THINGS HERE
 $startBtn.on("click", setupAndStart)
-$gameBoard.on("click", "td", handleClick);
+$gameBoard.on("click", ".clue", handleClick);
 
