@@ -1,10 +1,4 @@
-/* some colors you may find useful:
-  #115ff4
-  #060ce9
-  #28a200
-  #8d2ab5
-  #74119c
-*/
+
 body{
   background-color: #115ff4;
   font-family: Georgia, serif;
@@ -15,30 +9,20 @@ body{
   color: aliceblue;
 }
 
-.container-fluid{
-  max-width: 50%;
+.container-lg{
+  max-width: 85%;
+  max-height: auto;
 }
+
 #start-btn{
   color:white;
   background-color:#8d2ab5;
   margin-bottom: 10px;
   border: none;
 }
-table{
+.table{
   background-color: #060ce9 ;
-  border: solid 20px white;
-}
-
-.table td {
-  text-align: center; 
-  vertical-align: middle;
-  display: table-cell;
-  height:150px;
-  width: 300px;
-  max-width: 1px;
-  font-size: .5vw;
-  font-weight: bolder;
-  color:white;
+  table-layout: fixed;
 }
 
 #question{
@@ -48,22 +32,30 @@ table{
   background-color: #28a200;
 }
 
-
-thead{
-  height: 80px;
-}
-#category{
+td.clue{
+  vertical-align: middle;
+  table-layout: fixed;
+  width: 10%;
+  height: 120px;
   font-size: .8vw;
-  font-weight: bolder;
+  font-weight:lighter;
   color: white;
-  height: 60%;
+}
+
+#category{
+  vertical-align: middle;
+  font-size: .9vw;
+  font-weight: bold;
+  color: white;
+  height: 50%;
   
 }
+
 #question-mark{
   color: white;
   
 }
 #spinner{
   color:white;
-  margin-top: 15px;
+  margin-top: 55px;
 }

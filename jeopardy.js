@@ -7,14 +7,15 @@ $gameBoard = $("#game-board");
 $startBtn = $("#start-btn");
 $cluesTable = $("#clues");
 
-// where catagories and their corrisponding clues will be stored for the current game.
+// where catagories and their corresponding clues will be stored for the current game.
 let categories = [];
 
 
 /* PERSONAL THOUGHT - API limits returnable categories to 100 (from what i've gathered)/// if I were to 
-   stray from instructions (which i wont!), i would generate a random number between 0-18000
-   (roughly the total ammount of categories) and append those numbers as IDs to have greater sample size
-   / increase playability, perhaps there is a way around this with the API i am unfamilliar with and would love to discuss upon review! */
+   stray from instructions (which i wont!), i would generate a random number between 0-17000
+   (roughly the total amount of categories) and append those numbers as IDs to have greater sample size
+   / increase playability, perhaps there is a way around this with the API i am unfamiliar 
+   with and would love to discuss upon review! */
 
 
 /* request a list of 100 categories from API, and uses lodash to pick out 6 category IDs
@@ -32,10 +33,8 @@ async function getCategoryIds() {
     return _.sampleSize(categoryIdList, [n = 6]);
 };
 
-
-/** Return object with data about a category:
- *
- *  Returns { title: "Math", clues: clue-array }
+ /*
+ *   getCategory returns { title: "Math", clues: clue-array }
  *
  * Where clue-array is:
  *   [
@@ -46,7 +45,7 @@ async function getCategoryIds() {
  */
 
 /* returns an object containing the argument IDs (catId) category "title" and an 
-   array of 5 random clues (question/answers) corrisponding to that category  */
+   array of 5 random clues (question/answers) corresponding to that category  */
 async function getCategory(catId) {
     // API responds with object containing all the relevant information 
     // for category with ID of 'catID' argument
@@ -87,7 +86,7 @@ async function getCategory(catId) {
 /* when fillTable() is called a table element is appended to the $gameBoard div
    with a head row for categories and a table body section for each categories 
    5 clues, the clue elements will contain its showing status as ID,
-   and two data attributes, one for the question and one for the asnwer string */
+   and two data attributes, one for the question and one for the answer string */
 
 function fillTable() {
     console.log("fill table ran")
@@ -99,7 +98,7 @@ function fillTable() {
             <tbody id=${"clues"}></tbody>
         </table>`);
 
-    // in the top row of the jeopardy board (<thead>) add 1 cell for each catigory
+    // in the top row of the jeopardy board (<thead>) add 1 cell for each category
     for (let i = 0; i < NUM_CATEGORIES; i++) {
         $("#catagories").append(`<td id=category>${categories[i].title}</td>`);
     }
@@ -144,58 +143,55 @@ function fillTable() {
     }
 }
 
-/** Handle clicking on a clue: show the question or answer.
- *
- * Uses .showing property on clue to determine what to show:
- * - if currently null, show question & set .showing to "question"
- * - if currently "question", show answer & set .showing to "answer"
- * - if currently "answer", ignore click
- * */
+
+/* handles when category cell clicked, checks the cells ID (showing property) 
+   and acts accordingly...
+     if null => turn cell green and reveal question, changes ID to 'question' 
+     if 'question' => reveals answer, changes ID to 'answer' and ignores further clicks 
+*/
+     
 function handleClick(evt) {
     let $clickTarget = $(evt.target);
-    let $question = $clickTarget.data("question")
-    let $answer = $clickTarget.data("answer")
-
+    let $question = $clickTarget.data("question");
+    let $answer = $clickTarget.data("answer");
+    // checks showing status and changes cell data accordingly
     if ($clickTarget.attr("id") === "null") {
-        $clickTarget.closest("td").attr("id", "question")
+        $clickTarget.closest("td").attr("id", "question");
         $clickTarget.html($question);
     } else if ($clickTarget.attr("id") === "question") {
-        $clickTarget.closest("td").attr("id", "answer")
+        $clickTarget.closest("td").attr("id", "answer");
         $clickTarget.html($answer);
     } else {
         return;
     }
 }
 
+/** Wipe the current Jeopardy board, show the animated loading spinner,
+    and update the start button to read "loading" / temporarily 
+    turn off buttons click listener to avoid calling more than once. */
 
-/** Wipe the current Jeopardy board, show the loading spinner,
- * and update the button used to fetch data.
- */
 function showLoadingView() {
-    $startBtn.html("loading")
-    $startBtn.off()
+    $startBtn.html("loading");
+    $startBtn.off();
     $gameBoard.empty();
     $gameBoard.append('<i id="spinner" class="fas fa-spinner fa-spin fa-10x"></i>');
 
 }
 
 
-/** Remove the loading spinner and update the button used to fetch data. */
+/** Remove the loading spinner and updates "loading" button to be a 
+    "restart" button, that when clicked will make a new game table. */
 function hideLoadingView() {
     $("i").remove();
     $startBtn.html("restart!");
     $startBtn.on("click", setupAndStart);
 }
 
-/** Setup game data and board:
- * - get random category Ids
- * - get data for each category
- * - call fillTable to create HTML table
- */
-
 
 /* when called, gets a new list of random category Ids and appends 
-   category data structures to category array */
+   category data structures to category array, calls fillTable to make a 
+   new HTML table (game board)*/
+
 async function setupGameBoard() {
     let categoryIds = await getCategoryIds();
     // for each id in categoryIds, pass in into getCategory() and append result to category 
@@ -212,16 +208,10 @@ async function setupAndStart() {
     hideLoadingView();
 }
 
-/** At start:
- *
- * - Add a click handler to your start button that will run setupAndStart
- * - Add a click handler to your board that will run handleClick
- *   when you click on a clue
- */
+/* At start:
+   set click handler to your start button that will run setupAndStart
+   set a click handler to your board that will run handleClick when you click on a clue
+*/
 
-// ADD THOSE THINGS HERE
-$startBtn.on("click", setupAndStart)
+$startBtn.on("click", setupAndStart);
 $gameBoard.on("click", ".clue", handleClick);
-
-
-
