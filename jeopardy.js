@@ -7,22 +7,7 @@ $gameBoard = $("#game-board");
 $startBtn = $("#start-btn");
 $cluesTable = $("#clues");
 
-// categories is the main data structure for the app; it should eventually look like this:
-//  [
-//    { title: "Math",
-//      clues: [
-//        {question: "2+2", answer: "4", showing: null},
-//        {question: "1+1", answer: "2", showing: null}, ... 3 more clues ...
-//      ],
-//    },
-//    { title: "Literature",
-//      clues: [
-//        {question: "Hamlet Author", answer: "Shakespeare", showing: null},
-//        {question: "Bell Jar Author", answer: "Plath", showing: null}, ...
-//      ],
-//    }, ...4 more categories ...
-//  ]
-
+// where catagories and clues will be stored for the current game.
 let categories = [];
 
 
@@ -33,9 +18,10 @@ let categories = [];
 
 /* PERSONAL THOUGHT - API limits returnable categories to 100! if I were to stray from instructions (which i wont!), i would generate a random number
    between 0-18000(roughly the total ammount of categories) and append those numbers as IDs to have greater sample size / increase
-   playability */
+   playability, perhaps there is a way around this with the API i am unfamilliar with and would love to discuss upon review! */
 
-/* request a list of 100 categories from API, and uses lodash to pick out 6 IDs
+
+   /* request a list of 100 categories from API, and uses lodash to pick out 6 IDs
    randomly. returns array of 6 unique IDs */
 async function getCategoryIds() {
     // returns 100 categories from JService API
@@ -66,7 +52,6 @@ async function getCategoryIds() {
 /* returns an object containing the argument IDs (catId) category title and an 
    array of 5 random clues(question / answers) belonging to that category  */
 async function getCategory(catId) {
-
     // API responds with object containing all the relevant information 
     // for category with ID of 'catID' argument
     const response = await axios({
@@ -76,12 +61,20 @@ async function getCategory(catId) {
 
     // select 5 random clues from 'catId's category and save them to an array
     let randomClues = _.sampleSize(response.data.clues, [n = 5]);
-    console.log(randomClues)
+    let clueArray = []
+    for(let clue of randomClues){
+        clueArray.push({
+            question:clue.question,
+            answer:clue.answer,
+            showing:null
+        })
+    }
+    
 
     // returns object containing ID's title and all related clues 
     return {
         title: response.data.title,
-        clues: randomClues
+        clues: clueArray
     }
 }
 
@@ -112,34 +105,17 @@ function fillTable() {
         $("#catagories").append(`<td id=category>${categories[i].title}</td>`);
     }
 
-    // add 5 queston for each category
+    // add 5 queston for each category, each question will have two data attributes,
+    // data-question will contain the question and dat-answer will contain the answer
     for (let i = 0; i < NUM_CLUES_PER_CAT; i++) {
         $("#clues").append(`
         <tr>
-            <td class="clue" id="clue" 
-             data-question="${categories[0].clues[i].question}"
-             data-answer="${categories[0].clues[i].answer}">?
-            </td>
-            <td class="clue" id="clue" 
-             data-question="${categories[1].clues[i].question}"
-             data-answer="${categories[1].clues[i].answer}">?
-            </td>
-            <td class="clue" id="clue" 
-             data-question="${categories[2].clues[i].question}"
-             data-answer="${categories[2].clues[i].answer}">?
-            </td>
-            <td class="clue" id="clue" 
-             data-question="${categories[3].clues[i].question}"
-             data-answer="${categories[3].clues[i].answer}">?
-            </td>
-            <td class="clue" id="clue" 
-             data-question="${categories[4].clues[i].question}"
-             data-answer="${categories[4].clues[i].answer}">?
-            </td>
-            <td class="clue" id="clue" 
-             data-question="${categories[5].clues[i].question}"
-             data-answer="${categories[5].clues[i].answer}">?
-            </td>
+            <td class="clue" id="clue">?</td>
+            <td class="clue" id="clue">?</td>
+            <td class="clue" id="clue">?</td>
+            <td class="clue" id="clue">?</td>
+            <td class="clue" id="clue">?</td>
+            <td class="clue" id="clue">?</td>
         </tr>
         `);
     }
@@ -152,23 +128,11 @@ function fillTable() {
  * - if currently "question", show answer & set .showing to "answer"
  * - if currently "answer", ignore click
  * */
-
 function handleClick(evt) {
-
     let $clickTarget = $(evt.target);
-    let $question = $clickTarget.data("question")
-    let $answer = $clickTarget.data("answer")
-
     if ($clickTarget.attr("id") === "clue") {
-        $clickTarget.html($question)
-        $clickTarget.closest("td").attr("id", "question");
-
     } else if ($clickTarget.attr("id") === "question") {
-        $clickTarget.html($answer)
-        $clickTarget.closest("td").attr("id", "answer");
     } else {
-        console.log($clickTarget)
-        return;
     }
 }
 
@@ -177,7 +141,6 @@ function handleClick(evt) {
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
  */
-
 function showLoadingView() {
     $gameBoard.empty();
     $gameBoard.append('<i class="fas fa-spinner"></i>');
@@ -225,4 +188,3 @@ async function setupAndStart() {
 // ADD THOSE THINGS HERE
 $startBtn.on("click", setupAndStart)
 $gameBoard.on("click", ".clue", handleClick);
-
