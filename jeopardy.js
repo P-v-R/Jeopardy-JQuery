@@ -33,16 +33,16 @@ async function getCategoryIds() {
     return _.sampleSize(categoryIdList, [n = 6]);
 };
 
- /*
- *   getCategory returns { title: "Math", clues: clue-array }
- *
- * Where clue-array is:
- *   [
- *      {question: "Hamlet Author", answer: "Shakespeare", showing: null},
- *      {question: "Bell Jar Author", answer: "Plath", showing: null},
- *      ... 3 more ...
- *   ]
- */
+/*
+*   getCategory returns { title: "Math", clues: clue-array }
+*
+* Where clue-array is:
+*   [
+*      {question: "Hamlet Author", answer: "Shakespeare", showing: null},
+*      {question: "Bell Jar Author", answer: "Plath", showing: null},
+*      ... 3 more ...
+*   ]
+*/
 
 /* returns an object containing the argument IDs (catId) category "title" and an 
    array of 5 random clues (question/answers) corresponding to that category  */
@@ -105,51 +105,25 @@ function fillTable() {
 
     // add 5 clues for each category, each clue will an ID of its "showing status " have two 
     // data attributes, data-question will contain the question and data-answer will contain the answer
-    for (let i = 0; i < NUM_CLUES_PER_CAT; i++) {
-        $("#clues").append(`
-        <tr>
-            <td class="clue" id="${categories[0].clues[i].showing}" 
-                data-question="${categories[0].clues[i].question}"
-                data-answer="${categories[0].clues[i].answer}">
-                <span id="question-mark"class="fas fa-question-circle fa-3x"></span>
-            </td>
-            <td class="clue" id="${categories[1].clues[i].showing}" 
-                data-question="${categories[1].clues[i].question}"
-                data-answer="${categories[1].clues[i].answer}">
-                <span id="question-mark"class="fas fa-question-circle fa-3x"></span>
-            </td>
-            <td class="clue" id="${categories[2].clues[i].showing}" 
-                data-question="${categories[2].clues[i].question}"
-                data-answer="${categories[2].clues[i].answer}">
-                <span id="question-mark"class="fas fa-question-circle fa-3x"></span>
-            </td>
-            <td class="clue" id="${categories[3].clues[i].showing}" 
-                data-question="${categories[3].clues[i].question}"
-                data-answer="${categories[3].clues[i].answer}">
-                <span id="question-mark"class="fas fa-question-circle fa-3x"></span>
-            </td>
-            <td class="clue" id="${categories[4].clues[i].showing}" 
-                data-question="${categories[4].clues[i].question}"
-                data-answer="${categories[4].clues[i].answer}">
-                <span id="question-mark"class="fas fa-question-circle fa-3x"></span>
-            </td>
-            <td class="clue" id="${categories[5].clues[i].showing}" 
-                data-question="${categories[5].clues[i].question}"
-                data-answer="${categories[5].clues[i].answer}">
-                <span id="question-mark"class="fas fa-question-circle fa-3x"></span>
-            </td>
-        </tr>   
-        `);
+    for (let row = 0; row < NUM_CLUES_PER_CAT; row++) {
+        $("#clues").append(`<tr id="row${row}"></tr>`);
+        for (let col = 0; col < NUM_CATEGORIES; col++) {
+            $(`#row${row}`).append(`
+                <td class="clue" id="${categories[col].clues[row].showing}" 
+                    data-question="${categories[col].clues[row].question}"
+                    data-answer="${categories[col].clues[row].answer}">
+                    <span id="question-mark"class="fas fa-question-circle fa-3x"></span>
+                </td>`);
+        }
     }
 }
-
 
 /* handles when category cell clicked, checks the cells ID (showing property) 
    and acts accordingly...
      if null => turn cell green and reveal question, changes ID to 'question' 
      if 'question' => reveals answer, changes ID to 'answer' and ignores further clicks 
 */
-     
+
 function handleClick(evt) {
     let $clickTarget = $(evt.target);
     let $question = $clickTarget.data("question");
